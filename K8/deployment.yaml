@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-python-app
+  name: my-App-1
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: my-python-app
+      app: my-App-1
   template:
     metadata:
       labels:
-        app: my-python-app
+        app: my-App-1
     spec:
       containers:
-      - name: my-python-app
-        image: kubesamm/tasks:my-python-app
+      - name: my-App-1
+        image: kubesamm/my-App-1
         ports:
         - containerPort: 5000
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: my-python-app
+  name: my-App-1
 spec:
   type: NodePort
   ports:
@@ -29,4 +29,4 @@ spec:
     targetPort: 5000
     nodePort: 30001
   selector:
-    app: my-python-app
+    app: my-App-1

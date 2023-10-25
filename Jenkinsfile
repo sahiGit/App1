@@ -1,34 +1,36 @@
 pipeline {
     agent any
     stages {
-        stage('Build') {
+        stage('Pull') {
             steps {
-                sh 'echo "Building the project"'
-                sh 'date'
-                sh 'ls -al'
-                sh 'mkdir mybuild'
-                sh 'cd mybuild && pwd'
-                // Add your additional build steps here
+                git branch: 'Future1', url: 'https://github.com/sahiGit/App1.git'
             }
         }
-        stage('Test') {
+        stage('Build') {
             steps {
-                sh 'echo "Running tests"'
-                // Add your test steps here
+                script {
+                    def myApp1 = docker.build("my-App-1")
+                    sh 'docker build -t my-App-1 .'
+                }
+            }
+        }
+        stage('Push') {
+            steps {
+                sh 'docker login -u kubesamm -p sam@DockerHub'
+                sh 'docker tag my-App-1 kubesamm/my-App-1'
+                sh 'docker push kubesamm/my-App-1'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'echo "Deploying the project"'
-                // Add your deployment steps here
+                script {
+                    sh 'kubectl apply -f K8/deployment.yaml'
+                    sh 'kubectl set image deployment/my-App-1 my-App-1=kubesamm/my-App-1'
+                }
             }
         }
     }
     post {
-        always {
-            echo 'This will always run'
-            // Add any necessary cleanup steps here
-        }
         success {
             echo 'This will run only if the pipeline is successful'
             // Add actions to be performed if the pipeline succeeds
